@@ -1,0 +1,47 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+#
+# Package DCF
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Package DCF provides tools for various processing of DCF salmon data
+    Access sers electrofishing data, create maps, calculate parr densities etc.
+
+## Installation
+
+You can install Package DCF from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("SLU-Aqua-salmonids/DCF")
+```
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(DCF)
+## Display known rivers
+names(efish_sites)
+# Print table of known sites in river Rickleån
+sites <- dcf_known_efish_sites("Rickleån")
+knitr::kable(sites)
+catch <- dcf_get_efish_data(river = "Rickleån", year = 2024)
+head(catch)
+```
+
