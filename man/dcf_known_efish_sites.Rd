@@ -4,15 +4,15 @@
 \alias{dcf_known_efish_sites}
 \title{Get electro fishing site info}
 \usage{
-dcf_known_efish_sites(river, site_list = DCFsers::efish_sites)
+dcf_known_efish_sites(river, site_list = efish_sites)
 }
 \arguments{
 \item{river}{character Name of river}
 
-\item{site_list}{list of data frames. Default DCFsers::efish_sites}
+\item{site_list}{list of data frames. Default DCF::efish_sites}
 }
 \value{
-A data frame with information about sites in river. See [DCFsers::efish_sites]
+A data frame with information about sites in river. See [DCF::efish_sites]
 }
 \description{
 Get electro fishing site info

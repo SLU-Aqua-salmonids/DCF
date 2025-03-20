@@ -8,7 +8,7 @@ dcf_get_efish_data(
   river,
   year = as.numeric(format(Sys.Date(), "\%Y")),
   year2 = NULL,
-  wanted_sites = DCFsers::dcf_known_efish_sites(river)
+  wanted_sites = dcf_known_efish_sites(river)
 )
 }
 \arguments{
@@ -17,8 +17,6 @@ dcf_get_efish_data(
 \item{year}{numeric year to query or the string "all". Default current year}
 
 \item{year2}{optional numeric to return results between year and year2}
-
-\item{con}{a valid database connection to the SERS database}
 
 \item{species}{character string indication what species to query. Default "Lax".}
 
