@@ -10,9 +10,7 @@ library(dplyr)
 library(shiny)
 library(leaflet)
 library(sf)
-library(DCFsers)
-#sers <- DCFsers::sers_connect()
-#on.exit(DBI::dbDisconnect(sers))
+library(DCF)
 
 current_year <- as.numeric(format(Sys.Date(), '%Y'))
 years <- c(current_year:(current_year - 10))
@@ -24,18 +22,18 @@ ui <- fluidPage(
   # Application title
   titlePanel("Sers Fished Sites"),
 
-  # Sidebar with a slider input for number of bins
+  # Menu to select working group
   sidebarLayout(
     sidebarPanel(
       selectInput("group", label = "Group:",
                   choices = groups, selected = "WGBAST"),
       selectInput("year", label = "Year:",
                   choices = years, selected = current_year),
-      selectInput("river", label = "River:", choices = DCFsers::WGBAST_rivers),
+      selectInput("river", label = "River:", choices = DCF::WGBAST_rivers),
       textOutput("dateStamp")
     ),
 
-    # Show a plot of the generated distribution
+    # Define panels for output
     mainPanel(
       tabsetPanel(
         tabPanel("Overview",
@@ -54,24 +52,24 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   observe({
     if (input$group == "WGBAST") {
-      rivers <- DCFsers::WGBAST_rivers
+      rivers <- DCF::WGBAST_rivers
     } else if (input$group == "WGNAS") {
-      rivers <- DCFsers::WGNAS_rivers
+      rivers <- DCF::WGNAS_rivers
     }
     updateSelectInput(session,"river", choices = rivers)
   })
 
     output$yearTable <- renderTable({
       if (input$group == "WGBAST") {
-        rivers <- DCFsers::WGBAST_rivers
+        rivers <- DCF::WGBAST_rivers
       } else if (input$group == "WGNAS") {
-        rivers <- DCFsers::WGNAS_rivers
+        rivers <- DCF::WGNAS_rivers
       }
-      sites <- DCFsers::efish_sites[rivers]
+      sites <- DCF::efish_sites[rivers]
       status_table <- data.frame(River = rivers, Sites = NA, Done = 0)
       status_table$Sites <- sapply(1:length(rivers), function(x) {nrow(sites[[x]])})
       for (i in 1:length(rivers)) {
-        d <- DCFsers::dcf_get_efish_data(river = rivers[i], year = as.numeric(input$year))# %>%
+        d <- DCF::dcf_get_efish_data(river = rivers[i], year = as.numeric(input$year))# %>%
 #          filter(syfte == 'Nö-lax')
         done <- sum(!is.na(d$fiskedatum))
         status_table[i,]$Done <- done
@@ -81,23 +79,21 @@ server <- function(input, output, session) {
     })
 
     output$dateStamp <- renderText({
-      latest_date <- DCFsers::sers_latest_regdatum(sers)
+      latest_date <- DCF::sers_latest_regdatum(sers)
       return(paste0("Sers updated: ", latest_date))
     })
 
     output$riverFished <- renderTable({
-      res <- DCFsers::dcf_get_efish_data(input$river, year = as.numeric(input$year)) %>%
-        select(-hoh, -area, -bredd, -lokalbre, -langd) %>%
- #       filter(syfte == 'Nö-lax') %>%
-        left_join(DCFsers::dcf_known_efish_sites(input$river), by=c("xkoorlok", "ykoorlok")) %>%
-        select(-name, -Comment)
+      res <- DCF::dcf_get_efish_data(input$river, year = as.numeric(input$year)) %>%
+        select(-hoh, -area, -bredd,  -langd) #%>%
+#       filter(syfte == 'Nö-lax') %>%
       res$xkoorlok <- as.integer(res$xkoorlok)
       res$ykoorlok <- as.integer(res$ykoorlok)
       return(res)
     })
 
     output$riverMap <- renderLeaflet({
-      catch <- DCFsers::dcf_get_efish_data(input$river, year = as.numeric(input$year)) %>%
+      catch <- DCF::dcf_get_efish_data(input$river, year = as.numeric(input$year)) %>%
         mutate(status = if_else(is.na(fiskedatum), "not-fished", "fished"))
       icon_cols <- colorFactor(c("#ffb81c", "#ff585d"), domain = c("fished", "not-fished"))
       points <- dvfisk::sites_sf %>%
