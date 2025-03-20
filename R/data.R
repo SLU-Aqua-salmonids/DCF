@@ -3,10 +3,10 @@
 #
 #' Electofishing sites monitored in the DCF-program (WGBAST and WGNAS)
 #'
-#' Dataset DCFsers::efish_sites contains information about all electrofishing
+#' Dataset DCF::efish_sites contains information about all electrofishing
 #' sites monitored in the DCF-program. Xkoorlok and ykoorlok is the primary key
-#' to find a unique site in SERS. `DCFsers::WGBAST_rivers` and
-#' `DCFsers::WGNAS_rivers` are character vectors with rivers monitored by WG.
+#' to find a unique site in SERS. `DCF::WGBAST_rivers` and
+#' `DCF::WGNAS_rivers` are character vectors with rivers monitored by WG.
 #' These vectors can, for example, be used to loop do some processing for all
 #' rivers for a working group.
 #'

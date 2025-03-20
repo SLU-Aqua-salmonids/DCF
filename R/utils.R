@@ -1,20 +1,20 @@
 #' Get electro fishing site info
 #'
 #' @param river character Name of river
-#' @param site_list list of data frames. Default DCFsers::efish_sites
+#' @param site_list list of data frames. Default DCF::efish_sites
 #'
 #' @return
-#' A data frame with information about sites in river. See [DCFsers::efish_sites]
+#' A data frame with information about sites in river. See [DCF::efish_sites]
 #' @export
 #'
 #' @examples
 #' sites <- dcf_known_efish_sites("Sävarån")
-dcf_known_efish_sites <- function(river, site_list = DCFsers::efish_sites){
+dcf_known_efish_sites <- function(river, site_list = efish_sites){
   if (!(river %in% names(site_list))){
     warning("River ", river, " not found in list. Returning NULL")
     return(NULL)
   }
-  return(DCFsers::efish_sites[[river]])
+  return(efish_sites[[river]])
 }
 
 
@@ -22,11 +22,11 @@ dcf_known_efish_sites <- function(river, site_list = DCFsers::efish_sites){
 #'
 #' This function returns the catchment name for a river. The catchment name is
 #' from a data frame with the columns `rivername` and `haroname`. By default
-#' the data frame is `DCFsers::riverinfo` that contains information about rivers
+#' the data frame is `DCF::riverinfo` that contains information about rivers
 #' monitored in the DCF-program.
 #'
 #' @param river character vector with river names
-#' @param riverinfo data frame with columns `rivername` and `haroname`. Default DCFsers::riverinfo
+#' @param rinfo data frame with columns `rivername` and `haroname`. Default DCF::riverinfo
 #'
 #' @returns
 #' A character vector with catchment names for the rivers.
@@ -35,8 +35,7 @@ dcf_known_efish_sites <- function(river, site_list = DCFsers::efish_sites){
 #' @examples
 #' dcf_rivername2haroname(c("Emån", "Sävarån", "Vindelälven"))
 #'
-dcf_rivername2haroname <- function(river, riverinfo = DCFsers::riverinfo){
-  rinfo <- DCFsers::riverinfo
+dcf_rivername2haroname <- function(river, rinfo = DCF::riverinfo){
   if (!all((river %in% rinfo$rivername))){
     warning("All rivers ", paste0(river, collapse = ", "), " must be in riverinfo. Returning NULL")
     return(NULL)
@@ -53,21 +52,20 @@ dcf_rivername2haroname <- function(river, riverinfo = DCFsers::riverinfo){
 #'
 #' This function returns the catchment name for a river. The catchment name is
 #' from a data frame with the columns `rivername` and `haroname`. By default
-#' the data frame is `DCFsers::riverinfo` that contains information about rivers
+#' the data frame is `DCF::riverinfo` that contains information about rivers
 #' monitored in the DCF-program.
 #'
 #' @param river character vector with river names
-#' @param riverinfo data frame with columns `rivername` and `haronr`. Default DCFsers::riverinfo
+#' @param rinfo data frame with columns `rivername` and `haronr`. Default DCF::riverinfo
 #'
 #' @returns
 #' A character vector with catchment names for the rivers.
 #' @export
 #'
 #' @examples
-#' dcf_rivername2haroname(c("Emån", "Sävarån", "Vindelälven"))
+#' dcf_rivername2haronr(c("Emån", "Sävarån", "Vindelälven"))
 #'
-dcf_rivername2haronr <- function(river, riverinfo = DCFsers::riverinfo){
-  rinfo <- DCFsers::riverinfo
+dcf_rivername2haronr <- function(river, rinfo = riverinfo){
   if (!all((river %in% rinfo$rivername))){
     warning("All rivers ", paste0(river, collapse = ", "), " must be in riverinfo. Returning NULL")
     return(NULL)
