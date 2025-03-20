@@ -1,0 +1,363 @@
+---
+title: "SERS Yearly report - DCF Electrofishing"
+author: "Sölab"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  word_document: default
+  pdf_document:
+    latex_engine: xelatex
+header-includes: 
+  - \usepackage[labelfont=bf]{caption}
+  - \usepackage{longtable}
+  - \usepackage{booktabs}
+  - \usepackage{float}
+  - \captionsetup{justification=raggedright,singlelinecheck=false}  
+params:
+  river: "Emån"
+  year: 2024
+---
+
+```{r setup, include=FALSE}
+##
+## This template will produce a report electrofishing in the DCF program for one
+## river and one year. The report will include tables with all sites fished and
+## all sites not fished. A table with means for both salmon and trout are also
+## produced, the means are weighted if needed.
+## Change params river and year in the YML above and knit the file.
+##
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(DCFsers)
+library(ggplot2)
+library(sf)
+library(terra)
+library(flextable)
+flextable::set_flextable_defaults(border.width = .3)
+river <- params$river
+year <- params$year
+sites <- DCFsers::dcf_known_efish_sites(river = river)
+# Get results for "Lax"
+efish_result <- DCFsers::dcf_get_efish_data(river, year = year) %>%
+  dplyr::arrange(hoh) %>%
+  dplyr::select(lokal, vattendrag, fiskedatum, xkoorlok, ykoorlok,
+                lax0, lax, öring0, öring, antutfis) %>%
+  dplyr::left_join(sites, by=c("xkoorlok", "ykoorlok"))
+
+ 
+# HACK: Special remove extra fishing done by other than DCF. When you find a new
+## duplicated site add a filter to both res_salmon and res_trout here.
+## If we could trust "syfte" we could use that instead.
+efish_result <- efish_result %>%
+  dplyr::filter(!(vattendrag == "Vindelälven" & fiskedatum == 20230920 & lokal == "Linaforsen")) %>%
+  dplyr::filter(!(vattendrag == "Mattjokkbäcken" & fiskedatum == 20240910 & lokal == "Mynning 124")) %>%
+  dplyr::filter(!(vattendrag == "Åby älv" & fiskedatum == 20240814 & lokal == "Sandbacksforsen")) %>%
+  dplyr::filter(!(vattendrag == "Åby älv" & fiskedatum == 20240820 & lokal == "Brattforsen"))
+
+res_salmon <- efish_result %>%
+  dplyr::select(lokal, xkoorlok, ykoorlok, fiskedatum, oplus = lax0, 
+                storfisk = lax, used, since, section, area) %>%
+  dplyr::mutate(species = "Salmon")
+
+# Get results for "Öring"
+res_trout <- efish_result %>%
+  dplyr::select(lokal, xkoorlok, ykoorlok, fiskedatum, oplus = öring0, 
+                storfisk = öring, used, since, section, area) %>%
+  dplyr::mutate(species = "Trout")
+
+site_table <- res_salmon %>%
+  dplyr::mutate(Id = paste(xkoorlok, ykoorlok, sep = "-")) %>%
+  dplyr::mutate(Section = dplyr::if_else(is.na(section), "-", section)) %>%
+  dplyr::mutate(Used = dplyr::if_else(used, "Yes", "No")) %>%
+  dplyr::mutate(Orig = dplyr::if_else(since == 0, "Yes", "No")) %>%
+  group_by(Id) %>%
+  dplyr::mutate(N_visits = dplyr::n()) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(N_visits = dplyr::if_else(is.na(fiskedatum), N_visits - 1, N_visits)) %>%
+  dplyr::select(Site = lokal, Id, Section, Area = area, Used, N_visits, Orig) %>%
+  dplyr::distinct()
+
+#  dplyr::mutate(name = paste(lokalnam, xkoorlok, ykoorlok, sep = " - ")) %>%
+#  dplyr::select(name, lokalnam, xkoorlok, ykoorlok, section)
+
+not_fished <- res_salmon %>% dplyr::filter(is.na(fiskedatum))
+res_salmon <- res_salmon %>% dplyr::filter(!is.na(fiskedatum))
+used_salmon <- res_salmon %>% dplyr::filter(used)
+res_trout <- res_trout %>% dplyr::filter(!is.na(fiskedatum))
+used_trout <- res_trout %>% dplyr::filter(used)
+#not_fished <- sites %>% anti_join(res_salmon, by = c("xkoorlok", "ykoorlok"))
+percent_YoY_salmon <- sum(used_salmon$oplus > 0) / nrow(used_salmon) * 100
+percent_older_salmon <- sum(used_salmon$storfisk > 0) / nrow(used_salmon) * 100
+
+
+percent_YoY_trout <- sum(used_trout$oplus > 0) / nrow(used_trout) * 100
+percent_older_trout <- sum(used_trout$storfisk > 0) / nrow(used_trout) * 100
+#
+sections <- unique(sites$section)
+# Prepare a map of the river and sites
+map_sites <- DCFsers::sers_sites_sf(river, sites = DCFsers::dcf_known_efish_sites(river))
+coords <- as.data.frame(sf::st_coordinates(sf::st_transform(map_sites, crs = 4326)))
+coords$lokalnam <- map_sites$lokalnam
+coords$fished <- ifelse(coords$lokalnam %in% not_fished$name, "No", "Yes")
+coords$fished <- factor(coords$fished, levels = c("Yes", "No"))
+
+bg <- terra::rast(system.file(paste0("maps/", river, ".png"), package = "DCFsers"))
+site_map <- ggplot2::ggplot(data=coords, mapping = aes(x = X, y = Y)) +
+  tidyterra::geom_spatraster_rgb(data = bg) +
+  ggplot2::geom_point(aes(colour = fished)) +
+  ggplot2::scale_color_manual(limits = c("Yes", "No"), values=c("black", "red")) +
+  ggplot2::geom_text(aes(label=lokalnam), check_overlap = TRUE, size = 3) +
+  ggplot2::labs(x = NULL, y = NULL) +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30))
+
+```
+
+## DCF electro fishing in  `r river` year `r year`
+
+This is an autogenerated annual report for the DCF electrofishing program in
+`r river` year `r year`. The report is generated with data from the SERS database
+and knowledge about the DCF electrofishing program defined in the R-package `DCFsers`.
+See Section Description in this report for more information about the report.
+
+
+
+## Results
+
+In `r river` `r nrow(sites)` sites should be fished each year, in `r year` sites
+`r nrow(res_salmon)` sites were fished. Fishing was done between
+`r min(res_salmon$fiskedatum)` and `r max(res_salmon$fiskedatum)`. In Table 1 below
+all sites are listed with information about the site defined in `DCFsers` (Site, Id,
+Section, Area, Used and Orig), N_visits is the number of fishing occasions found
+for this year. If the site has
+more than one visit you should examine why and choose the right occasion, if visits
+is zero no fishing was done (which might be normal but check why).
+Zero+ salmon was found at `r round(percent_YoY_salmon, 0)` percent of the sites
+and salmon older than 0+ at `r round(percent_older_salmon,0)` percent of the sites.
+Zero+  trout was found at `r round(percent_YoY_trout, 0)` percent of the sites.
+
+The "percent found" is calculated as the number of sites with catch > 0 divided by the
+number of sites marked as used and fished this year.
+
+```{r tab_site_overview, echo=FALSE, ft.align="left", results='asis'}
+  cap <- paste("Sites defined in package DCFsers", river)
+  ft <- site_table %>%
+    flextable::qflextable() %>%
+    flextable::color(i = ~ N_visits != 1,
+                     j = "N_visits",
+                     color = "red") %>%
+#    flextable::colformat_int(j = c(2,3), big.mark = "") %>%
+    flextable::set_caption(caption = cap) %>%
+    flextable::autofit()
+  ft
+```
+
+
+```{r fig1, fig.cap="Map of sites", echo=FALSE, fig.pos="H"}
+print(site_map)
+```
+
+
+```{r, tab_notfished, echo=FALSE, ft.align="left", results='asis'}
+# if (nrow(not_fished) > 0) {
+#   tab <-  not_fished %>%
+#     dplyr::mutate(xkoorlok = as.integer(xkoorlok), ykoorlok = as.integer(ykoorlok)) %>%
+#     dplyr::select(Site = lokalnam, xkoorlok, ykoorlok, Section = section)
+#   cap <- paste("DCF sites not fished in", river, "year", year)
+#   ft <- tab %>%
+#     flextable::qflextable() %>%
+#     flextable::colformat_int(j = c(2,3), big.mark = "") %>%
+#     flextable::set_caption(caption = cap) %>%
+#     flextable::autofit()
+#   ft
+#}
+```
+
+### Site estimates
+
+```{r, tab_fished, echo=FALSE, ft.align="left", results='asis'}
+ttab <- res_trout %>%
+  dplyr::select(
+    Site = lokalnam, Date = fiskedatum, Toplus = oplus,
+    Tstorfisk = storfisk, antutfis)
+
+ltab <- res_salmon %>%
+  dplyr::select(
+    Site = lokalnam, Date = fiskedatum, Loplus = oplus,
+    Lstorfisk = storfisk) %>%
+  dplyr::left_join(ttab, by = c("Site", "Date"))
+
+cap <- paste("Estimated number of salmon and trout per 100 square meter at each site in", river, "year", year)
+ft <- ltab %>%
+  flextable::qflextable() %>%
+  flextable::colformat_int(j = 2, big.mark = "") %>%
+  flextable::set_caption(caption = cap) %>%
+  flextable::compose(
+    i = 1, j = "Loplus", part = "header",
+    value = flextable::as_paragraph("Sal", flextable::as_sub("0+"))) %>%
+  flextable::compose(
+    i = 1, j = "Lstorfisk", part = "header",
+    value = flextable::as_paragraph("Sal", flextable::as_sub(">0+"))) %>%
+  flextable::compose(
+    i = 1, j = "Toplus", part = "header",
+    value = flextable::as_paragraph("Trout", flextable::as_sub("0+"))) %>%
+  flextable::compose(
+    i = 1, j = "Tstorfisk", part = "header",
+    value = flextable::as_paragraph("Trout", flextable::as_sub(">0+"))) %>%
+  flextable::compose(
+    i = 1, j = "antutfis", part = "header",
+    value = flextable::as_paragraph("N", flextable::as_sub("passes"))) %>%
+  flextable::autofit()
+ft
+```
+
+
+
+
+### River estimates
+
+Some rivers are divided in 2 or more sections. When a river is divided the river
+estimate is calculated as a weighted mean of the mean of each section using the
+section area as weight. When there is only one section the estimate is a simple
+mean over all sites.
+
+`r river` has `r length(sections)` section(s) defined.
+
+#### Weighted (if needed) mean of salmon and trout all sites (extended program)
+
+```{r, tab_summary, echo=FALSE, ft.align="left", results='asis'}
+# Calc salmon means
+ltab <- used_salmon %>%
+#  dplyr::filter(used, !is.na(oplus)) %>%
+  dplyr::select(Section = section, Area = area, oplus, storfisk) %>%
+  dplyr::group_by(Section, Area) %>%
+  dplyr::summarise(Loplus = mean(oplus), 
+            Lstorfisk  = mean(storfisk),
+            .groups = "drop")
+# Calc trout means
+ttab <- used_trout %>%
+#  dplyr::filter(used, !is.na(oplus)) %>%
+  dplyr::select(Section = section, Area = area, oplus, storfisk) %>%
+  dplyr::group_by(Section, Area) %>%
+  dplyr::summarise(Toplus = mean(oplus), 
+            Tstorfisk  = mean(storfisk), N_sites = n(), .groups = "drop")
+# Combine  to salmon an trout table
+tab <- ltab %>%
+  left_join(ttab, by = c("Section", "Area"))
+if (length(sections) > 1) { ## Add weighted mean if more than one sections
+  # Calc weighted mean
+  weighted_tot <- tibble(Section = "Total (weighted)",
+                         Area = NA,
+                         Loplus = weighted.mean(ltab$Loplus, ltab$Area),
+                         Lstorfisk = weighted.mean(ltab$Lstorfisk, ltab$Area),
+                         Toplus = weighted.mean(ttab$Toplus, ttab$Area),
+                         Tstorfisk = weighted.mean(ttab$Tstorfisk, ttab$Area),
+                         N_sites = sum(ttab$N_sites))
+  
+ tab <-  tab %>%
+    bind_rows(weighted_tot) 
+}
+tab <- tab %>%
+    dplyr::mutate(dplyr::across(dplyr::ends_with(c("oplus", "storfisk")),
+                                ~round(.x, 1)))
+  
+# Format with flextable and print
+cap <- paste("Mean number of 0+ salmon and trout per 100 square meter at each section in", river, "year", year)
+ft <- tab %>%
+  flextable::qflextable() %>%
+  flextable::colformat_char(na_str = "-") %>%
+  flextable::compose(
+    i = 1, j = "Loplus", part = "header",
+    value = flextable::as_paragraph("Sal", flextable::as_sub("0+"))) %>%
+  flextable::compose(
+    i = 1, j = "Lstorfisk", part = "header",
+    value = flextable::as_paragraph("Sal", flextable::as_sub(">0+"))) %>%
+  flextable::compose(
+    i = 1, j = "Toplus", part = "header",
+    value = flextable::as_paragraph("Trout", flextable::as_sub("0+"))) %>%
+  flextable::compose(
+    i = 1, j = "Tstorfisk", part = "header",
+    value = flextable::as_paragraph("Trout", flextable::as_sub(">0+"))) %>%
+  flextable::compose(
+    i = 1, j = "N_sites", part = "header",
+    value = flextable::as_paragraph("N", flextable::as_sub("sites")))
+if (length(sections) > 1) {
+  ft <- ft %>%
+    flextable::bold(i = nrow(tab), j = 1, bold = TRUE)
+}
+ft <- ft %>%
+  flextable::set_caption(caption = cap) %>%
+  flextable::autofit()
+ft
+```
+
+
+#### Unweighted mean of salmon and trout "original" sites
+
+Table with results from "original", "not extended" sites. This is just unweighted
+means for sites in the original electrofishing program.
+
+```{r, tab_orig, echo=FALSE, ft.align="left", results='asis'}
+## Create a table with unweighted means for original sites. Original sites are
+## sites that have the value zero in the "since" column.
+## The criteria for a site to be used is that it is marked as "used", 
+## has been fished (!is.na(fiskedatum)) and has a value of zero in the "since" column.
+
+salmon_orig <- res_salmon %>%
+  dplyr::filter(used, !is.na(fiskedatum), since == 0) %>%
+  dplyr::select(Site = lokalnam, oplus, storfisk) %>%
+  dplyr::summarise(Oplus = mean(oplus), 
+            Storfisk  = mean(storfisk),
+            N_sites = n(),
+            .groups = "drop") %>%
+  mutate(Species = "Salmon")
+
+trout_orig <- res_trout %>%
+  dplyr::filter(used, !is.na(fiskedat), since == 0) %>%
+  dplyr::select(Site = lokalnam, oplus, storfisk) %>%
+  dplyr::summarise(Oplus = mean(oplus), 
+            Storfisk  = mean(storfisk),
+            N_sites = n(),
+            .groups = "drop") %>%
+  mutate(Species = "Trout")
+
+tab <- rbind(salmon_orig, trout_orig) %>%
+  dplyr::select(Species, Oplus, Storfisk, N_sites)
+
+cap <- paste("Unweighted Mean number of 0+ salmon and trout per 100 square meter at non extended sites in", river, "year", year)
+ft<- tab %>%
+  flextable::qflextable() %>%
+  flextable::colformat_char(na_str = "-") %>%
+  flextable::colformat_double(digits = 1) %>%
+  flextable::compose(
+    i = 1, j = 2, part = "header",
+    value = flextable::as_paragraph("Sal", flextable::as_sub("0+"))) %>%
+  flextable::compose(
+    i = 1, j = 3, part = "header",
+    value = flextable::as_paragraph("Sal", flextable::as_sub(">0+"))) %>%
+  flextable::compose(
+    i = 1, j = 4, part = "header",
+    value = flextable::as_paragraph("N", flextable::as_sub("sites"))) %>%
+   flextable::set_caption(caption = cap) %>%
+  flextable::autofit()
+
+ft
+
+```
+
+
+## Description
+
+The report gives an overview of the fishing in the river, the sites fished and
+and missing sites (if any). The report also includes estimates of the number parr
+per site. The last table shows the mean number of parr per 100 square meter. If
+the river is divided in sections (i.e. upstreams and downstream of some migration
+obstacle) the mean is weighted by area of each section.
+
+The data used in this report is extracted from the SERS database using infomation
+on the DCF electrofishing program defined in the R-package `DCFsers`.
+
+Due to limitations in SERS estimates are only available for two year classes, 0+
+and older than 0+. For some rivers the WGBAST FLHM uses three year classes
+(Åbyälven and north) and for those the estimates are from this report should not
+be used as model input. The same is true if the estimates from a river need some
+special adjustments, i.e. adjust for extra mortality in Åbyälven.

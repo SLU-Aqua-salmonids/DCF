@@ -1,0 +1,21 @@
+Package: DCF
+Type: Package
+Title: Tools for various processing of DCF data
+Version: 0.6.0
+Author: Anders Kagervall
+Maintainer: Anders Kagervall <anders.kagervall@slu.se>
+Description: Tools for various processing of DCF salmon data
+    Access sers electrofishing data, create maps, calculate parr densities etc.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.0.0)
+Imports:
+    dvfisk,
+    sf,
+    ggplot2,
+    terra,
+    flextable
+Remotes:
+    kagervall/dvfisk
+RoxygenNote: 7.3.2

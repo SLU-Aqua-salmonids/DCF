@@ -1,0 +1,53 @@
+---
+title: "Status electrofishing DCF"
+author: "Sölab"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+params:
+  year: 2024
+  group: "WGBAST"
+---
+
+```{r setup, include=FALSE}
+## 
+## Change params in header to set group and year
+##
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(DCFsers) # remotes::install_github("https://github.com/kagervall/DCFsers")
+year <- as.numeric(params$year)
+group <- params$group
+
+if (group == "WGBAST") {
+  rivers <- DCFsers::WGBAST_rivers
+} else if (group == "WGNAS") {
+   rivers <- DCFsers::WGNAS_rivers
+}
+status_table <- data.frame(River = rivers, Sites = NA, Done = 0, Duplicates = "")
+for (i in 1:length(rivers)) {
+  status_table[i,]$Sites <- nrow(dcf_known_efish_sites(rivers[i]))
+  d <- dcf_get_efish_data(river = rivers[i], year = year) %>%
+    group_by(xkoorlok, ykoorlok) %>%
+    mutate(N_visits = row_number())
+  done <- sum(!is.na(d$fiskedatum))
+  status_table[i,]$Done <- done
+  status_table[i,]$Duplicates <- ifelse(sum(d$N_visits > 1) > 0, "Yes", "No") 
+
+}
+
+latest_date <- sers_latest_regdatum(con)
+```
+
+## No of fished `r group`-sites in SERS for `r year`
+Number of sites defined as `r group` site in the yearly DCF program and the number of those
+site that have been fished in `r year`.
+
+
+```{r table, echo=FALSE}
+knitr::kable(status_table)
+```
+
+SERS updated: `r latest_date`

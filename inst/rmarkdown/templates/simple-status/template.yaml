@@ -1,0 +1,5 @@
+name: SERS - Simple status
+description: >
+   Create a smiple overview of how many site (WGBAST or WGNAS) have made it to
+   SERS in a given year.
+create_dir: FALSE

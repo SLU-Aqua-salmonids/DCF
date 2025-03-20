@@ -1,0 +1,4 @@
+name: SERS - River Yearly Report
+description: >
+   Create a report for DCF fishing in one river in a given year.
+create_dir: FALSE
