@@ -4,12 +4,12 @@
 \alias{dcf_rivername2haroname}
 \title{Return catchment name for river}
 \usage{
-dcf_rivername2haroname(river, riverinfo = DCFsers::riverinfo)
+dcf_rivername2haroname(river, rinfo = DCF::riverinfo)
 }
 \arguments{
 \item{river}{character vector with river names}
 
-\item{riverinfo}{data frame with columns `rivername` and `haroname`. Default DCFsers::riverinfo}
+\item{rinfo}{data frame with columns `rivername` and `haroname`. Default DCF::riverinfo}
 }
 \value{
 A character vector with catchment names for the rivers.
@@ -17,7 +17,7 @@ A character vector with catchment names for the rivers.
 \description{
 This function returns the catchment name for a river. The catchment name is
 from a data frame with the columns `rivername` and `haroname`. By default
-the data frame is `DCFsers::riverinfo` that contains information about rivers
+the data frame is `DCF::riverinfo` that contains information about rivers
 monitored in the DCF-program.
 }
 \examples{
