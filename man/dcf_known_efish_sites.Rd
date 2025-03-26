@@ -4,7 +4,7 @@
 \alias{dcf_known_efish_sites}
 \title{Get electro fishing site info}
 \usage{
-dcf_known_efish_sites(river, site_list = efish_sites)
+dcf_known_efish_sites(river, site_list = DCF::efish_sites)
 }
 \arguments{
 \item{river}{character Name of river}
