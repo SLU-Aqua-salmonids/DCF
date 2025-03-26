@@ -80,7 +80,7 @@ server <- function(input, output, session) {
       } else if (input$group == "WGNAS") {
         rivers <- DCF::WGNAS_rivers
       }
-      sites <- efish_sites[rivers]
+      sites <- DCF::efish_sites[rivers]
       status_table <- data.frame(River = rivers, Sites = NA, Done = 0)
       status_table$Sites <- sapply(1:length(rivers), function(x) {nrow(sites[[x]])})
       for (i in 1:length(rivers)) {
@@ -110,7 +110,7 @@ server <- function(input, output, session) {
 
     output$riverMap <- leaflet::renderLeaflet({
       catch <- dcf_get_efish_data(input$river, year = as.numeric(input$year)) |>
-        dplyr::mutate(status = if_else(is.na(fiskedatum), "not-fished", "fished"))
+        dplyr::mutate(status = dplyr::if_else(is.na(fiskedatum), "not-fished", "fished"))
       icon_cols <- colorFactor(c("#ffb81c", "#ff585d"), domain = c("fished", "not-fished"))
       points <- dvfisk::sites_sf |>
         dplyr::right_join(catch, by = join_by(xkoorlok, ykoorlok))
