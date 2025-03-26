@@ -9,12 +9,12 @@
 #'
 #' @examples
 #' sites <- dcf_known_efish_sites("Sävarån")
-dcf_known_efish_sites <- function(river, site_list = efish_sites){
+dcf_known_efish_sites <- function(river, site_list = DCF::efish_sites){
   if (!(river %in% names(site_list))){
     warning("River ", river, " not found in list. Returning NULL")
     return(NULL)
   }
-  return(efish_sites[[river]])
+  return(site_list[[river]])
 }
 
 
