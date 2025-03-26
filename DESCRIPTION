@@ -15,7 +15,9 @@ Imports:
     sf,
     ggplot2,
     terra,
-    flextable
+    flextable,
+    dplyr,
+    leaflet
 Remotes:
     kagervall/dvfisk
 RoxygenNote: 7.3.2
