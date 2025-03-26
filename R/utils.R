@@ -65,7 +65,7 @@ dcf_rivername2haroname <- function(river, rinfo = DCF::riverinfo){
 #' @examples
 #' dcf_rivername2haronr(c("Emån", "Sävarån", "Vindelälven"))
 #'
-dcf_rivername2haronr <- function(river, rinfo = riverinfo){
+dcf_rivername2haronr <- function(river, rinfo = DCF::riverinfo){
   if (!all((river %in% rinfo$rivername))){
     warning("All rivers ", paste0(river, collapse = ", "), " must be in riverinfo. Returning NULL")
     return(NULL)

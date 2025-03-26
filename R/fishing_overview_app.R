@@ -76,9 +76,9 @@ server <- function(input, output, session) {
 
     output$yearTable <- shiny::renderTable({
       if (input$group == "WGBAST") {
-        rivers <- WGBAST_rivers
+        rivers <- DCF::WGBAST_rivers
       } else if (input$group == "WGNAS") {
-        rivers <- WGNAS_rivers
+        rivers <- DCF::WGNAS_rivers
       }
       sites <- efish_sites[rivers]
       status_table <- data.frame(River = rivers, Sites = NA, Done = 0)
@@ -110,7 +110,7 @@ server <- function(input, output, session) {
 
     output$riverMap <- leaflet::renderLeaflet({
       catch <- dcf_get_efish_data(input$river, year = as.numeric(input$year)) |>
-        mutate(status = if_else(is.na(fiskedatum), "not-fished", "fished"))
+        dplyr::mutate(status = if_else(is.na(fiskedatum), "not-fished", "fished"))
       icon_cols <- colorFactor(c("#ffb81c", "#ff585d"), domain = c("fished", "not-fished"))
       points <- dvfisk::sites_sf |>
         dplyr::right_join(catch, by = join_by(xkoorlok, ykoorlok))
