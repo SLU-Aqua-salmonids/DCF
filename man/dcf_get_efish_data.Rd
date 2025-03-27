@@ -18,8 +18,6 @@ dcf_get_efish_data(
 
 \item{year2}{optional numeric to return results between year and year2}
 
-\item{species}{character string indication what species to query. Default "Lax".}
-
 \item{sites}{a data frame with xkoorlok and ykoorlok}
 }
 \value{
@@ -31,7 +29,7 @@ Get electrofishing data for a river for one species one year
 }
 \examples{
 \dontrun{
-res <- dcf_get_efish_data("Vindelälven", species = "Lax", year= 2018)
+res <- dcf_get_efish_data("Vindelälven", year= 2018)
 head(res)
 }
 }
