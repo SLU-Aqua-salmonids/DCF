@@ -17,9 +17,9 @@
 #' head(res)
 #' }
 dcf_get_efish_data <- function(river,
-                              year = as.numeric(format(Sys.Date(), "%Y")),
-                              year2 = NULL,
-                              wanted_sites = dcf_known_efish_sites(river)) {
+                               year = as.numeric(format(Sys.Date(), "%Y")),
+                               year2 = NULL,
+                               wanted_sites = dcf_known_efish_sites(river)) {
   haro <- dcf_rivername2haronr(river)
   if (length(haro) != 1) {
     stop(sprintf("River %s not found in SERS", river))
@@ -37,25 +37,50 @@ dcf_get_efish_data <- function(river,
     stop('year must numeric or the string "all"')
   }
 
-  xcoords <- wanted_sites$xkoorlok
-  ycoords <- wanted_sites$ykoorlok
-
   fished_sites <- dvfisk::sers_vix_rapport(haroNr = haro,
-                                       startdatum = start_date,
-                                       slutdatum = stop_date)
+                                           startdatum = start_date,
+                                           slutdatum = stop_date)
   if (length(fished_sites) == 0) {
     warning("No data returned from SERS")
     return(NULL)
   }
+  xcoords <- wanted_sites$xkoorlok
+  ycoords <- wanted_sites$ykoorlok
+
   fished_sites <- fished_sites |>
     dplyr::filter(xkoorlok %in% xcoords & ykoorlok %in% ycoords) |>
-    dplyr::select(haronr = harO_NR, vattendrag, lokal, xkoorlok, ykoorlok,fiskedatum,
-                  syfte, hoh, lax0, lax, lax0ber, laxber, lax0pval, laxpval,
-                  öring0, öring, örin0ber, öringber, öri0pval, örinpval,
-                  antutfis, metod, bredd, langd, fished_area = area)
+    dplyr::select(
+      haronr = harO_NR,
+      vattendrag,
+      lokal,
+      xkoorlok,
+      ykoorlok,
+      fiskedatum,
+      syfte,
+      hoh,
+      lax0,
+      lax,
+      lax0ber,
+      laxber,
+      lax0pval,
+      laxpval,
+      öring0,
+      öring,
+      örin0ber,
+      öringber,
+      öri0pval,
+      örinpval,
+      antutfis,
+      metod,
+      bredd,
+      langd,
+      fished_area = area
+    )
 
   res <- wanted_sites |>
     dplyr::left_join(fished_sites, by = dplyr::join_by(xkoorlok, ykoorlok)) |>
+    dplyr::mutate(lokal = if_else(is.na(lokal), name, lokal)) |> # Use "name" (from built-in data) if "lokal" (from SERS) is missing
+    dplyr::select(-name) |>
     dplyr::arrange(hoh)
 
   return(res)
