@@ -79,7 +79,9 @@ dcf_get_efish_data <- function(river,
 
   res <- wanted_sites |>
     dplyr::left_join(fished_sites, by = dplyr::join_by(xkoorlok, ykoorlok)) |>
-    dplyr::mutate(lokal = if_else(is.na(lokal), name, lokal)) |> # Use "name" (from built-in data) if "lokal" (from SERS) is missing
+    dplyr::mutate(lokal = dplyr::if_else(is.na(lokal),
+                                         name,
+                                         lokal)) |> # Use "name" (from built-in data) if "lokal" (from SERS) is missing
     dplyr::select(-name) |>
     dplyr::arrange(hoh)
 
