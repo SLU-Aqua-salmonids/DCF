@@ -100,7 +100,7 @@ server <- function(input, output, session) {
 
     output$riverFished <- shiny::renderTable({
       res <- dcf_get_efish_data(input$river, year = as.numeric(input$year)) |>
-        dplyr::select(name, xkoorlok, ykoorlok, fiskedatum, syfte, lax0, lax,
+        dplyr::select(lokal, xkoorlok, ykoorlok, fiskedatum, syfte, lax0, lax,
                öring0, öring, antutfis)
 
       res$xkoorlok <- as.integer(res$xkoorlok)
