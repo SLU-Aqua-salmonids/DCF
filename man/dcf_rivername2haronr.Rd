@@ -4,7 +4,7 @@
 \alias{dcf_rivername2haronr}
 \title{Return catchment number for river}
 \usage{
-dcf_rivername2haronr(river, rinfo = riverinfo)
+dcf_rivername2haronr(river, rinfo = DCF::riverinfo)
 }
 \arguments{
 \item{river}{character vector with river names}
