@@ -17,14 +17,14 @@ params:
 ##
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
-library(DCFsers) # remotes::install_github("https://github.com/kagervall/DCFsers")
+library(DCF) # remotes::install_github("https://github.com/SLU-Aqua-salmonids/DCF")
 year <- as.numeric(params$year)
 group <- params$group
 
 if (group == "WGBAST") {
-  rivers <- DCFsers::WGBAST_rivers
+  rivers <- DCF::WGBAST_rivers
 } else if (group == "WGNAS") {
-   rivers <- DCFsers::WGNAS_rivers
+   rivers <- DCF::WGNAS_rivers
 }
 status_table <- data.frame(River = rivers, Sites = NA, Done = 0, Duplicates = "")
 for (i in 1:length(rivers)) {
