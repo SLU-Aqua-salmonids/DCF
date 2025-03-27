@@ -61,10 +61,6 @@
 <dd><p>optional numeric to return results between year and year2</p></dd>
 
 
-<dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
-<dd><p>character string indication what species to query. Default "Lax".</p></dd>
-
-
 <dt id="arg-sites">sites<a class="anchor" aria-label="anchor" href="#arg-sites"></a></dt>
 <dd><p>a data frame with xkoorlok and ykoorlok</p></dd>
 
@@ -78,7 +74,7 @@ fished in the time period.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">dcf_get_efish_data</span><span class="op">(</span><span class="st">"Vindelälven"</span>, species <span class="op">=</span> <span class="st">"Lax"</span>, year<span class="op">=</span> <span class="fl">2018</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">dcf_get_efish_data</span><span class="op">(</span><span class="st">"Vindelälven"</span>, year<span class="op">=</span> <span class="fl">2018</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
