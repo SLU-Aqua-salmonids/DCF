@@ -3,7 +3,6 @@
 #' @param river character string with name of river.
 #' @param year numeric year to query or the string "all". Default current year
 #' @param year2 optional numeric to return results between year and year2
-#' @param species character string indication what species to query. Default "Lax".
 #' @param sites a data frame with xkoorlok and ykoorlok
 #'
 #' @return
@@ -13,7 +12,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' res <- dcf_get_efish_data("Vindelälven", species = "Lax", year= 2018)
+#' res <- dcf_get_efish_data("Vindelälven", year= 2018)
 #' head(res)
 #' }
 dcf_get_efish_data <- function(river,
