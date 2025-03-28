@@ -111,9 +111,9 @@ server <- function(input, output, session) {
     output$riverMap <- leaflet::renderLeaflet({
       catch <- dcf_get_efish_data(input$river, year = as.numeric(input$year)) |>
         dplyr::mutate(status = dplyr::if_else(is.na(fiskedatum), "not-fished", "fished"))
-      icon_cols <- colorFactor(c("#ffb81c", "#ff585d"), domain = c("fished", "not-fished"))
+      icon_cols <- leaflet::colorFactor(c("#ffb81c", "#ff585d"), domain = c("fished", "not-fished"))
       points <- dvfisk::sites_sf |>
-        dplyr::right_join(catch, by = join_by(xkoorlok, ykoorlok))
+        dplyr::right_join(catch, by = dplyr::join_by(xkoorlok, ykoorlok))
       popup_text <-sprintf("<div><b>%s</b></br>0+: %s</br>>0+: %s</div>", points$lokal, points$lax0, points$lax)
       leaflet::leaflet(points) |>
         leaflet::addProviderTiles(leaflet::providers$OpenStreetMap, group = "Open Street Map") |> # options = providerTileOptions(noWrap = TRUE)
