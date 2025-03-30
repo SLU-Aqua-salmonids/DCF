@@ -4,10 +4,12 @@
 \alias{dcf_known_efish_sites}
 \title{Get electro fishing site info}
 \usage{
-dcf_known_efish_sites(river, site_list = efish_sites)
+dcf_known_efish_sites(river, as_sf = FALSE, site_list = DCF::efish_sites)
 }
 \arguments{
 \item{river}{character Name of river}
+
+\item{as_sf}{logical. If TRUE return sites as sf object. Default FALSE}
 
 \item{site_list}{list of data frames. Default DCF::efish_sites}
 }

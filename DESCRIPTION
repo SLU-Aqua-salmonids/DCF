@@ -1,7 +1,7 @@
 Package: DCF
 Type: Package
 Title: Tools for various processing of DCF data
-Version: 0.6.0
+Version: 0.6.1
 Author: Anders Kagervall
 Maintainer: Anders Kagervall <anders.kagervall@slu.se>
 Description: Tools for various processing of DCF salmon data
@@ -15,7 +15,10 @@ Imports:
     sf,
     ggplot2,
     terra,
-    flextable
+    flextable,
+    dplyr,
+    leaflet
 Remotes:
     kagervall/dvfisk
 RoxygenNote: 7.3.2
+URL: https://slu-aqua-salmonids.github.io/DCF/

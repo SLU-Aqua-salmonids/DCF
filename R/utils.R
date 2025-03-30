@@ -1,6 +1,7 @@
 #' Get electro fishing site info
 #'
 #' @param river character Name of river
+#' @param as_sf logical. If TRUE return sites as sf object. Default FALSE
 #' @param site_list list of data frames. Default DCF::efish_sites
 #'
 #' @return
@@ -9,12 +10,22 @@
 #'
 #' @examples
 #' sites <- dcf_known_efish_sites("Sävarån")
-dcf_known_efish_sites <- function(river, site_list = efish_sites){
+dcf_known_efish_sites <- function(river, as_sf = FALSE, site_list = DCF::efish_sites){
+
   if (!(river %in% names(site_list))){
     warning("River ", river, " not found in list. Returning NULL")
     return(NULL)
   }
-  return(efish_sites[[river]])
+  sites <- site_list[[river]]
+  if (as_sf){
+    if (requireNamespace("sf", quietly = TRUE)){
+      sites <- dvfisk::sites_sf |>
+        dplyr::right_join(sites, by = join_by(xkoorlok, ykoorlok))
+    } else {
+      warning("Package sf is required to return sites as sf object")
+    }
+  }
+  return(sites)
 }
 
 
@@ -65,7 +76,7 @@ dcf_rivername2haroname <- function(river, rinfo = DCF::riverinfo){
 #' @examples
 #' dcf_rivername2haronr(c("Emån", "Sävarån", "Vindelälven"))
 #'
-dcf_rivername2haronr <- function(river, rinfo = riverinfo){
+dcf_rivername2haronr <- function(river, rinfo = DCF::riverinfo){
   if (!all((river %in% rinfo$rivername))){
     warning("All rivers ", paste0(river, collapse = ", "), " must be in riverinfo. Returning NULL")
     return(NULL)
