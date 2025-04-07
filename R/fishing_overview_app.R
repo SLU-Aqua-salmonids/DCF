@@ -31,6 +31,9 @@ dcf_efish_app <- function() {
   years <- c(current_year:(current_year - 10))
   groups <- c ("WGBAST", "WGNAS")
 
+  if (!requireNamespace("sf")) {
+    message('Install package "sf" for maps to work')
+  }
 # Define UI for app ----------------------------------------------------------
 ui <- shiny::fluidPage(
 
