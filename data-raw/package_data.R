@@ -7,7 +7,7 @@ if (requireNamespace("readxl", quietly = TRUE) &&
   message("readxl and usethis are available")
 } else {
   stop("readxl and usethis packages are required to run this script.")
-})
+}
 
 WGBAST_rivers <- readxl::excel_sheets("data-raw/WGBAST_sites.xlsx")
 WGBAST_sites <- lapply(WGBAST_rivers, function(r) {
