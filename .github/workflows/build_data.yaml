@@ -27,6 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt install libcurl4-openssl-dev
           R -e 'install.packages("usethis")'
           R -e 'install.packages("readxl")'
 
