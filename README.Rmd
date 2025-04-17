@@ -20,7 +20,18 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 Package DCF provides tools for various processing of DCF salmon data
-    Access sers electrofishing data, create maps, calculate parr densities etc.
+Access sers electrofishing data, create maps, calculate parr densities etc. The package
+uses the `dvfisk` to access SERS.
+
+To information on what rivers and what electrofishing sites is available in several data
+structures made available in the package:
+
+ - `WGBAST_rivers` and `WGNAS_rivers` list of rivernames used
+ 
+ - `riverinfo` connects rivername with official catchment name and number
+ 
+ - `efish_sites` contains information about all sites included in the DCF program
+ 
 
 ## Installation
 

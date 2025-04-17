@@ -10,7 +10,17 @@
 
 Package DCF provides tools for various processing of DCF salmon data
 Access sers electrofishing data, create maps, calculate parr densities
-etc.
+etc. The package uses the `dvfisk` to access SERS.
+
+To information on what rivers and what electrofishing sites is available
+in several data structures made available in the package:
+
+- `WGBAST_rivers` and `WGNAS_rivers` list of rivernames used
+
+- `riverinfo` connects rivername with official catchment name and number
+
+- `efish_sites` contains information about all sites included in the DCF
+  program
 
 ## Installation
 
@@ -69,32 +79,32 @@ knitr::kable(sites)
 ``` r
 catch <- dcf_get_efish_data(river = "Rickleån", year = 2024)
 head(catch)
-#>                   name xkoorlok ykoorlok         section area used since
-#> 1        Nättingforsen   711897   175020   Nedan Bruksf. 15.0 TRUE     0
-#> 2       Laxbacksforsen   712460   174705   Nedan Bruksf. 15.0 TRUE     0
-#> 3        Åströmsforsen   712520   174650   Nedan Bruksf. 15.0 TRUE     0
-#> 4 Isakfäbodforsen övre   713322   174119 Ovan Fredriksf. 16.8 TRUE  2018
-#> 5       Tjärdalsforsen   713426   174010 Ovan Fredriksf. 16.8 TRUE  2018
-#> 6     Faranforsen övre   713511   173898 Ovan Fredriksf. 16.8 TRUE  2018
-#>   Comment haronr vattendrag                lokal fiskedatum  syfte hoh lax0 lax
-#> 1      NA  24000   Rickleån        Nättingforsen   20240923 Nö-lax   2  1.7 4.1
-#> 2      NA  24000   Rickleån       Laxbacksforsen   20240923 Nö-lax  17 14.3 4.6
-#> 3      NA  24000   Rickleån        Åströmsforsen   20240923 Nö-lax  20  9.0 3.3
-#> 4      NA  24000   Rickleån Isakfäbodforsen övre   20240925 Nö-lax  61  0.0 0.0
-#> 5      NA  24000   Rickleån       Tjärdalsforsen   20240925 Nö-lax  64 21.9 4.5
-#> 6      NA  24000   Rickleån     Faranforsen övre   20241002 Nö-lax  80 15.0 2.5
-#>   lax0ber laxber lax0pval laxpval öring0 öring örin0ber öringber öri0pval
-#> 1       1      1     0.45    0.55    1.6   0.0        1       -9     0.48
-#> 2       3      3     0.83    0.98    1.9   1.1        3        1     0.79
-#> 3       1      1     0.45    0.55    0.8   0.0        1       -9     0.48
-#> 4      NA     NA       NA    0.00    2.6   0.0        1       -9     0.48
-#> 5       1      1     0.45    0.55    5.1   0.0        1       -9     0.48
-#> 6       3      3     0.62    0.99    0.6   1.5        1        3     0.86
-#>   örinpval antutfis metod bredd langd fished_area
-#> 1     0.00        1  Kval    31    21         132
-#> 2     0.91        3 Kvant    27    32         202
-#> 3     0.00        1  Kval    39    26         272
-#> 4     0.00        1  Kval    28    27          81
-#> 5     0.00        1  Kval    38    27          81
-#> 6     0.98        3 Kvant    36    24         205
+#>   xkoorlok ykoorlok         section area used since Comment haronr vattendrag
+#> 1   711897   175020   Nedan Bruksf. 15.0 TRUE     0      NA  24000   Rickleån
+#> 2   712460   174705   Nedan Bruksf. 15.0 TRUE     0      NA  24000   Rickleån
+#> 3   712520   174650   Nedan Bruksf. 15.0 TRUE     0      NA  24000   Rickleån
+#> 4   713322   174119 Ovan Fredriksf. 16.8 TRUE  2018      NA  24000   Rickleån
+#> 5   713426   174010 Ovan Fredriksf. 16.8 TRUE  2018      NA  24000   Rickleån
+#> 6   713511   173898 Ovan Fredriksf. 16.8 TRUE  2018      NA  24000   Rickleån
+#>                  lokal fiskedatum  syfte hoh lax0 lax lax0ber laxber lax0pval
+#> 1        Nättingforsen   20240923 Nö-lax   2  1.7 4.1       1      1     0.45
+#> 2       Laxbacksforsen   20240923 Nö-lax  17 14.3 4.6       3      3     0.83
+#> 3        Åströmsforsen   20240923 Nö-lax  20  9.0 3.3       1      1     0.45
+#> 4 Isakfäbodforsen övre   20240925 Nö-lax  61  0.0 0.0      NA     NA       NA
+#> 5       Tjärdalsforsen   20240925 Nö-lax  64 21.9 4.5       1      1     0.45
+#> 6     Faranforsen övre   20241002 Nö-lax  80 15.0 2.5       3      3     0.62
+#>   laxpval öring0 öring örin0ber öringber öri0pval örinpval antutfis metod bredd
+#> 1    0.55    1.6   0.0        1       -9     0.48     0.00        1  Kval    31
+#> 2    0.98    1.9   1.1        3        1     0.79     0.91        3 Kvant    27
+#> 3    0.55    0.8   0.0        1       -9     0.48     0.00        1  Kval    39
+#> 4    0.00    2.6   0.0        1       -9     0.48     0.00        1  Kval    28
+#> 5    0.55    5.1   0.0        1       -9     0.48     0.00        1  Kval    38
+#> 6    0.99    0.6   1.5        1        3     0.86     0.98        3 Kvant    36
+#>   langd fished_area
+#> 1    21         132
+#> 2    32         202
+#> 3    26         272
+#> 4    27          81
+#> 5    27          81
+#> 6    24         205
 ```
