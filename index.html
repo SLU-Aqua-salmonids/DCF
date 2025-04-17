@@ -53,7 +53,13 @@
 </h1>
 <!-- badges: start -->
 <!-- badges: end -->
-<p>Package DCF provides tools for various processing of DCF salmon data Access sers electrofishing data, create maps, calculate parr densities etc.</p>
+<p>Package DCF provides tools for various processing of DCF salmon data Access sers electrofishing data, create maps, calculate parr densities etc. The package uses the <code>dvfisk</code> to access SERS.</p>
+<p>To information on what rivers and what electrofishing sites is available in several data structures made available in the package:</p>
+<ul>
+<li><p><code>WGBAST_rivers</code> and <code>WGNAS_rivers</code> list of rivernames used</p></li>
+<li><p><code>riverinfo</code> connects rivername with official catchment name and number</p></li>
+<li><p><code>efish_sites</code> contains information about all sites included in the DCF program</p></li>
+</ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -246,34 +252,34 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">catch</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/dcf_get_efish_data.html">dcf_get_efish_data</a></span><span class="op">(</span>river <span class="op">=</span> <span class="st">"Rickleån"</span>, year <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">catch</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                   name xkoorlok ykoorlok         section area used since</span></span>
-<span><span class="co">#&gt; 1        Nättingforsen   711897   175020   Nedan Bruksf. 15.0 TRUE     0</span></span>
-<span><span class="co">#&gt; 2       Laxbacksforsen   712460   174705   Nedan Bruksf. 15.0 TRUE     0</span></span>
-<span><span class="co">#&gt; 3        Åströmsforsen   712520   174650   Nedan Bruksf. 15.0 TRUE     0</span></span>
-<span><span class="co">#&gt; 4 Isakfäbodforsen övre   713322   174119 Ovan Fredriksf. 16.8 TRUE  2018</span></span>
-<span><span class="co">#&gt; 5       Tjärdalsforsen   713426   174010 Ovan Fredriksf. 16.8 TRUE  2018</span></span>
-<span><span class="co">#&gt; 6     Faranforsen övre   713511   173898 Ovan Fredriksf. 16.8 TRUE  2018</span></span>
-<span><span class="co">#&gt;   Comment haronr vattendrag                lokal fiskedatum  syfte hoh lax0 lax</span></span>
-<span><span class="co">#&gt; 1      NA  24000   Rickleån        Nättingforsen   20240923 Nö-lax   2  1.7 4.1</span></span>
-<span><span class="co">#&gt; 2      NA  24000   Rickleån       Laxbacksforsen   20240923 Nö-lax  17 14.3 4.6</span></span>
-<span><span class="co">#&gt; 3      NA  24000   Rickleån        Åströmsforsen   20240923 Nö-lax  20  9.0 3.3</span></span>
-<span><span class="co">#&gt; 4      NA  24000   Rickleån Isakfäbodforsen övre   20240925 Nö-lax  61  0.0 0.0</span></span>
-<span><span class="co">#&gt; 5      NA  24000   Rickleån       Tjärdalsforsen   20240925 Nö-lax  64 21.9 4.5</span></span>
-<span><span class="co">#&gt; 6      NA  24000   Rickleån     Faranforsen övre   20241002 Nö-lax  80 15.0 2.5</span></span>
-<span><span class="co">#&gt;   lax0ber laxber lax0pval laxpval öring0 öring örin0ber öringber öri0pval</span></span>
-<span><span class="co">#&gt; 1       1      1     0.45    0.55    1.6   0.0        1       -9     0.48</span></span>
-<span><span class="co">#&gt; 2       3      3     0.83    0.98    1.9   1.1        3        1     0.79</span></span>
-<span><span class="co">#&gt; 3       1      1     0.45    0.55    0.8   0.0        1       -9     0.48</span></span>
-<span><span class="co">#&gt; 4      NA     NA       NA    0.00    2.6   0.0        1       -9     0.48</span></span>
-<span><span class="co">#&gt; 5       1      1     0.45    0.55    5.1   0.0        1       -9     0.48</span></span>
-<span><span class="co">#&gt; 6       3      3     0.62    0.99    0.6   1.5        1        3     0.86</span></span>
-<span><span class="co">#&gt;   örinpval antutfis metod bredd langd fished_area</span></span>
-<span><span class="co">#&gt; 1     0.00        1  Kval    31    21         132</span></span>
-<span><span class="co">#&gt; 2     0.91        3 Kvant    27    32         202</span></span>
-<span><span class="co">#&gt; 3     0.00        1  Kval    39    26         272</span></span>
-<span><span class="co">#&gt; 4     0.00        1  Kval    28    27          81</span></span>
-<span><span class="co">#&gt; 5     0.00        1  Kval    38    27          81</span></span>
-<span><span class="co">#&gt; 6     0.98        3 Kvant    36    24         205</span></span></code></pre></div>
+<span><span class="co">#&gt;   xkoorlok ykoorlok         section area used since Comment haronr vattendrag</span></span>
+<span><span class="co">#&gt; 1   711897   175020   Nedan Bruksf. 15.0 TRUE     0      NA  24000   Rickleån</span></span>
+<span><span class="co">#&gt; 2   712460   174705   Nedan Bruksf. 15.0 TRUE     0      NA  24000   Rickleån</span></span>
+<span><span class="co">#&gt; 3   712520   174650   Nedan Bruksf. 15.0 TRUE     0      NA  24000   Rickleån</span></span>
+<span><span class="co">#&gt; 4   713322   174119 Ovan Fredriksf. 16.8 TRUE  2018      NA  24000   Rickleån</span></span>
+<span><span class="co">#&gt; 5   713426   174010 Ovan Fredriksf. 16.8 TRUE  2018      NA  24000   Rickleån</span></span>
+<span><span class="co">#&gt; 6   713511   173898 Ovan Fredriksf. 16.8 TRUE  2018      NA  24000   Rickleån</span></span>
+<span><span class="co">#&gt;                  lokal fiskedatum  syfte hoh lax0 lax lax0ber laxber lax0pval</span></span>
+<span><span class="co">#&gt; 1        Nättingforsen   20240923 Nö-lax   2  1.7 4.1       1      1     0.45</span></span>
+<span><span class="co">#&gt; 2       Laxbacksforsen   20240923 Nö-lax  17 14.3 4.6       3      3     0.83</span></span>
+<span><span class="co">#&gt; 3        Åströmsforsen   20240923 Nö-lax  20  9.0 3.3       1      1     0.45</span></span>
+<span><span class="co">#&gt; 4 Isakfäbodforsen övre   20240925 Nö-lax  61  0.0 0.0      NA     NA       NA</span></span>
+<span><span class="co">#&gt; 5       Tjärdalsforsen   20240925 Nö-lax  64 21.9 4.5       1      1     0.45</span></span>
+<span><span class="co">#&gt; 6     Faranforsen övre   20241002 Nö-lax  80 15.0 2.5       3      3     0.62</span></span>
+<span><span class="co">#&gt;   laxpval öring0 öring örin0ber öringber öri0pval örinpval antutfis metod bredd</span></span>
+<span><span class="co">#&gt; 1    0.55    1.6   0.0        1       -9     0.48     0.00        1  Kval    31</span></span>
+<span><span class="co">#&gt; 2    0.98    1.9   1.1        3        1     0.79     0.91        3 Kvant    27</span></span>
+<span><span class="co">#&gt; 3    0.55    0.8   0.0        1       -9     0.48     0.00        1  Kval    39</span></span>
+<span><span class="co">#&gt; 4    0.00    2.6   0.0        1       -9     0.48     0.00        1  Kval    28</span></span>
+<span><span class="co">#&gt; 5    0.55    5.1   0.0        1       -9     0.48     0.00        1  Kval    38</span></span>
+<span><span class="co">#&gt; 6    0.99    0.6   1.5        1        3     0.86     0.98        3 Kvant    36</span></span>
+<span><span class="co">#&gt;   langd fished_area</span></span>
+<span><span class="co">#&gt; 1    21         132</span></span>
+<span><span class="co">#&gt; 2    32         202</span></span>
+<span><span class="co">#&gt; 3    26         272</span></span>
+<span><span class="co">#&gt; 4    27          81</span></span>
+<span><span class="co">#&gt; 5    27          81</span></span>
+<span><span class="co">#&gt; 6    24         205</span></span></code></pre></div>
 </div>
 </div>
 
