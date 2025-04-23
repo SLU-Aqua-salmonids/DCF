@@ -9,7 +9,7 @@ Description: Tools for various processing of DCF salmon data
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 4.0.0)
+Depends: R (>= 4.1.0)
 Imports:
     dvfisk,
     sf,
