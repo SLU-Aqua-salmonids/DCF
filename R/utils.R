@@ -20,7 +20,7 @@ dcf_known_efish_sites <- function(river, as_sf = FALSE, site_list = DCF::efish_s
   if (as_sf){
     if (requireNamespace("sf", quietly = TRUE)){
       sites <- dvfisk::sites_sf |>
-        dplyr::right_join(sites, by = join_by(xkoorlok, ykoorlok))
+        dplyr::right_join(sites, by = dplyr::join_by(xkoorlok, ykoorlok))
     } else {
       warning("Package sf is required to return sites as sf object")
     }
