@@ -87,11 +87,11 @@ coords$fished <- ifelse(coords$lokalnam %in% not_fished$name, "No", "Yes")
 coords$fished <- factor(coords$fished, levels = c("Yes", "No"))
 
 bg <- terra::rast(system.file(paste0("maps/", river, ".png"), package = "DCF"))
-site_map <- ggplot2::ggplot(data=coords, mapping = aes(x = X, y = Y)) +
+site_map <- ggplot2::ggplot(data=coords, mapping = ggplot2::aes(x = X, y = Y)) +
   tidyterra::geom_spatraster_rgb(data = bg) +
-  ggplot2::geom_point(aes(colour = fished)) +
+  ggplot2::geom_point(ggplot2::aes(colour = fished)) +
   ggplot2::scale_color_manual(limits = c("Yes", "No"), values=c("black", "red")) +
-  ggplot2::geom_text(aes(label=lokalnam), check_overlap = TRUE, size = 3) +
+  ggplot2::geom_text(ggplot2::aes(label=lokalnam), check_overlap = TRUE, size = 3) +
   ggplot2::labs(x = NULL, y = NULL) +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30))
 
@@ -147,7 +147,7 @@ print(site_map)
 if (nrow(not_fished) > 0) {
    tab <-  not_fished |>
      dplyr::mutate(xkoorlok = as.integer(xkoorlok), ykoorlok = as.integer(ykoorlok)) |>
-     dplyr::select(Site = lokalnam, xkoorlok, ykoorlok, Section = section)
+     dplyr::select(Site = lokal, xkoorlok, ykoorlok, Section = section)
    cap <- paste("DCF sites not fished in", river, "year", year)
    ft <- tab |>
      flextable::qflextable() |>
