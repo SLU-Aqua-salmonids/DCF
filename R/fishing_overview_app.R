@@ -11,6 +11,7 @@
 #library(leaflet)
 #library(sf)
 #library(DCF)
+#library(dvfisk)
 
 
 #' dcf_efish_app: A Shiny app for displaying e-fishing data
@@ -115,7 +116,7 @@ server <- function(input, output, session) {
       catch <- dcf_get_efish_data(input$river, year = as.numeric(input$year)) |>
         dplyr::mutate(status = dplyr::if_else(is.na(fiskedatum), "not-fished", "fished"))
       icon_cols <- leaflet::colorFactor(c("#ffb81c", "#ff585d"), domain = c("fished", "not-fished"))
-      points <- dvfisk::sites_sf |>
+      points <- dvfisk::sers_sites_sf |>
         dplyr::right_join(catch, by = dplyr::join_by(xkoorlok, ykoorlok))
       popup_text <-sprintf("<div><b>%s</b></br>0+: %s</br>>0+: %s</div>", points$lokal, points$lax0, points$lax)
       leaflet::leaflet(points) |>
